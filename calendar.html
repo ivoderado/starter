@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Year Calendar 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      padding: 32px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 32px;
+      color: #1a1a2e;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .month {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .month-name {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #4a5568;
+      margin-bottom: 12px;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .day-header {
+      text-align: center;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #a0aec0;
+      text-transform: uppercase;
+      padding: 4px 0 6px;
+    }
+
+    .day {
+      text-align: center;
+      font-size: 0.78rem;
+      padding: 5px 2px;
+      border-radius: 6px;
+      cursor: default;
+      line-height: 1.6;
+      transition: background 0.15s;
+    }
+
+    .day:hover:not(.empty):not(.today) {
+      background: #edf2f7;
+    }
+
+    .day.empty { visibility: hidden; }
+
+    .day.weekend { color: #e53e3e; }
+
+    .day.today {
+      background: #4f46e5;
+      color: #fff !important;
+      font-weight: 700;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(79,70,229,0.45);
+    }
+
+    .today-banner {
+      text-align: center;
+      margin-bottom: 28px;
+      font-size: 0.95rem;
+      color: #4a5568;
+    }
+
+    .today-banner strong {
+      color: #4f46e5;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.4rem; }
+      .grid { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>2026</h1>
+<p class="today-banner">Today is <strong id="today-label"></strong></p>
+<div class="grid" id="calendar"></div>
+
+<script>
+  const today = new Date();
+  const YEAR = today.getFullYear();
+  const TODAY_MONTH = today.getMonth();
+  const TODAY_DAY = today.getDate();
+
+  const MONTHS = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+  const DAY_HEADERS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+  document.getElementById("today-label").textContent =
+    `${MONTHS[TODAY_MONTH]} ${TODAY_DAY}, ${YEAR}`;
+
+  document.title = `Year Calendar ${YEAR}`;
+  document.querySelector("h1").textContent = YEAR;
+
+  const grid = document.getElementById("calendar");
+
+  MONTHS.forEach((monthName, monthIndex) => {
+    const firstDay = new Date(YEAR, monthIndex, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(YEAR, monthIndex + 1, 0).getDate();
+
+    const monthEl = document.createElement("div");
+    monthEl.className = "month";
+
+    const nameEl = document.createElement("div");
+    nameEl.className = "month-name";
+    nameEl.textContent = monthName;
+    monthEl.appendChild(nameEl);
+
+    const daysGrid = document.createElement("div");
+    daysGrid.className = "days-grid";
+
+    // Day-of-week headers
+    DAY_HEADERS.forEach(d => {
+      const h = document.createElement("div");
+      h.className = "day-header";
+      h.textContent = d;
+      daysGrid.appendChild(h);
+    });
+
+    // Empty cells before first day
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("div");
+      empty.className = "day empty";
+      empty.textContent = ".";
+      daysGrid.appendChild(empty);
+    }
+
+    // Day cells
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(YEAR, monthIndex, day);
+      const dow = date.getDay(); // 0=Sun, 6=Sat
+
+      const cell = document.createElement("div");
+      cell.className = "day";
+      cell.textContent = day;
+
+      if (dow === 0 || dow === 6) cell.classList.add("weekend");
+      if (monthIndex === TODAY_MONTH && day === TODAY_DAY) {
+        cell.classList.add("today");
+        cell.title = "Today";
+      }
+
+      daysGrid.appendChild(cell);
+    }
+
+    monthEl.appendChild(daysGrid);
+    grid.appendChild(monthEl);
+  });
+</script>
+</body>
+</html>
